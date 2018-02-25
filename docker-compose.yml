@@ -1,0 +1,10 @@
+version: '2'
+services:
+  replicator:
+    build: .
+    image: Cube-Earth/build-proxy
+    container_name: build-proxy
+    volumes:
+    - $HOME/.containers/build-proxy/cache:/cache:rw
+    ports: 
+    - "8889:8889"
