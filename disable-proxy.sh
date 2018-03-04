@@ -4,7 +4,7 @@ if [[ "$f" == "true" ]]
 then
 	opwd=$PWD
     echo stopping proxying container ...
-	cd "`dirname \"$_\"`"
+	cd "`dirname \"${BASH_SOURCE[0]}\"`"
 	docker-compose down
 	cd "$opwd"
 fi

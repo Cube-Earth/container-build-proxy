@@ -3,8 +3,8 @@ f=`docker inspect -f {{.State.Running}} build-proxy 2>/dev/null`
 if [[ ! "$f" == "true" ]]
 then
 	opwd=$PWD
-    echo starting proxying container ...
-	cd "`dirname \"$_\"`"
+	echo starting proxying container ...
+	cd "`dirname \"${BASH_SOURCE[0]}\"`"
 	docker-compose up -d
 	cd "$opwd"
 	sleep 1
@@ -12,7 +12,13 @@ fi
 
 
 #container_ip=`docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' build-proxy`
-ip=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'`
+
+if [[ "`uname -r`" = *"coreos"* ]]
+then
+	ip=`ifconfig | awk '/^[a-zA-Z]/ { split($0,a,":"); n=a[1] } / +inet / && n ~ /^ens[0-9]+$/ { match ($0, " inet [0-9.]+"); ip=substr($0,RSTART+6,RLENGTH-6); print ip }' | head -n 1`
+else
+	ip=`ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | head -n 1`
+fi
 
 export http_proxy="http://$ip:8889"
 echo "proxy: $http_proxy"
